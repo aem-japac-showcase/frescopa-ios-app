@@ -45,7 +45,10 @@ struct LoginView: View {
                                 .font(.headline)
                                 .foregroundColor(Color(hex: "592020"))
                             
-                            TextField("", text: $username)
+                            TextField("", text: Binding(
+                                get: { self.username },
+                                set: { self.username = $0.lowercased() }
+                            ))
                                 .padding()
                                 .background(Color.white)
                                 .cornerRadius(50)
