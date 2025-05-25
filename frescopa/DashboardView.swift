@@ -3,14 +3,20 @@ import SwiftUI
 struct DashboardView: View {
     var displayName: String?
     var username: String
+    var gender: String? = "undefined"
     var beanLevel: Double = 0.5
     var waterLevel: Double = 0.8
     var cleanLevel: Double = 0.4
-    var offerText: String? = nil
+    var offerText: String? = "Enjoy your first cup, on us."
+    
     
     var bannerURL: URL {
-        let headline =  displayName?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "Hello"
-        return URL(string: "https://s7ap1.scene7.com/is/image/adobeanz/Frescopa%20Mobile%20App?$subhead= \(headline)&wid=2000&hei=2000&qlt=100&fit=constrain&cachebust=123")!
+        
+        let subhead = "CHECK THIS OUT, " + displayName!.uppercased()
+
+        let isMan = 0 == gender?.caseInsensitiveCompare("male").rawValue ?? 1
+        
+        return URL(string: "https://s7ap1.scene7.com/is/image/adobeanz/Frescopa%20Mobile%20App?$subhead=\(subhead)&$headline=\(offerText ?? "We just love making cofee")&$isMan=\(isMan)&wid=2000&hei=2000&qlt=100&fit=constrain&cachebust=123")!
     }
     
     private var greeting: String {
@@ -51,6 +57,13 @@ struct DashboardView: View {
                     Image(username)
                         .resizable()
                         .frame(width: 35, height: 35)
+                        .onTapGesture {
+                            // Add logout logic
+                            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                                windowScene.windows.first?.rootViewController = UIHostingController(rootView: LoginView())
+                                windowScene.windows.first?.makeKeyAndVisible()
+                            }
+                        }
                 }
                 .padding(.horizontal, 32)
                 .padding(.vertical, 12)
@@ -285,8 +298,8 @@ struct DashboardView: View {
 struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            DashboardView(displayName: "Mark", username: "mszulc", beanLevel: 0.5, waterLevel: 0.6, cleanLevel: 0.3, offerText: "Kick off your day with a perfect cup of coffee!")
-            DashboardView(displayName: "Sarah", username: "srose", beanLevel: 0.9, waterLevel: 0.2, cleanLevel: 0.1, offerText: "Begin each day with a perfect cup of coffee!")
+            DashboardView(displayName: "Mark", username: "mszulc", gender: "male", beanLevel: 0.5, waterLevel: 0.6, cleanLevel: 0.3, offerText: "Kick off your day with a perfect cup of coffee!")
+            DashboardView(displayName: "Sarah", username: "srose", gender: "female", beanLevel: 0.9, waterLevel: 0.2, cleanLevel: 0.1, offerText: "Begin each day with a perfect cup of coffee!")
         }
     }
 }
