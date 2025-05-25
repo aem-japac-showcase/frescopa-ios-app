@@ -3,13 +3,15 @@ import SwiftUI
 struct DashboardView: View {
     var displayName: String?
     var username: String
+    var beanLevel: Double = 0.5
+    var waterLevel: Double = 0.8
+    var cleanLevel: Double = 0.4
+    var offerText: String? = nil
     
-    // Status indicators for coffee machine
-    @State private var beanLevel: Double = 0.7
-    @State private var waterLevel: Double = 0.8
-    @State private var cleanLevel: Double = 0.4
-    
-    @State private var showMenu = false
+    var bannerURL: URL {
+        let headline =  displayName?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "Hello"
+        return URL(string: "https://s7ap1.scene7.com/is/image/adobeanz/Frescopa%20Mobile%20App?$subhead= \(headline)&wid=2000&hei=2000&qlt=100&fit=constrain&cachebust=123")!
+    }
     
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -27,16 +29,11 @@ struct DashboardView: View {
             VStack(spacing: 0) {
                 // Navigation header
                 HStack {
-                    Button(action: {
-                        withAnimation {
-                            showMenu.toggle()
-                        }
-                    }) {
-                        Image(systemName: "line.horizontal.3")
-                            .foregroundColor(Color(hex: "8E2426"))
-                            .scaledToFit()
-                            .frame(width: 43, height: 43)
-                    }
+                    Image("hamburger")
+                        .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(Color(hex: "6F2232"))
+                        .frame(width: 33, height: 27)
                     
                     Spacer()
                 
@@ -51,11 +48,11 @@ struct DashboardView: View {
                     Spacer()
                     
                     // User profile icon
-                    Image(systemName: "person.circle.fill")
-                        .font(.system(size: 35))
-                        .foregroundColor(.gray)
+                    Image(username)
+                        .resizable()
+                        .frame(width: 35, height: 35)
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 32)
                 .padding(.vertical, 12)
                 .background(Color.white)
                 .shadow(color: Color.black.opacity(0.3), radius: 1)
@@ -84,53 +81,74 @@ struct DashboardView: View {
                         
                         // Machine status section
                         HStack(alignment: .top, spacing: 12) {
+
+                            Spacer()
+
                             // Status indicators
                             VStack(alignment: .center, spacing: 16) {
                                 // Bean level
-                                HStack(spacing: 10) {
-                                    Image(systemName: "circle.fill")
+                                HStack(spacing: 5) {
+                                    Image("bean")
+                                        .resizable()
+                                        .renderingMode(.template)
                                         .foregroundColor(Color(hex: "6F2232"))
+                                        .frame(width: 21, height: 14.5)
+                                    
+                                    Spacer()
                                     
                                     ProgressView(value: beanLevel)
                                         .progressViewStyle(LinearProgressViewStyle(tint: Color(hex: "6F2232")))
                                         .background(Color(hex: "E6D2C3"))
-                                        .frame(width: 140, height: 12)
+                                        .frame(width: 140, height: 20)
                                         .clipShape(Capsule())
                                 }
                                 
                                 // Water level
-                                HStack(spacing: 10) {
-                                    Image(systemName: "drop.fill")
+                                HStack(spacing: 5) {
+                                    Image("droplet")
+                                        .resizable()
+                                        .renderingMode(.template)
                                         .foregroundColor(Color(hex: "6F2232"))
+                                        .frame(width: 12, height: 19.1)
+                                    
+                                    Spacer()
                                     
                                     ProgressView(value: waterLevel)
                                         .progressViewStyle(LinearProgressViewStyle(tint: Color(hex: "6F2232")))
                                         .background(Color(hex: "E6D2C3"))
-                                        .frame(width: 140, height: 12)
+                                        .frame(width: 140, height: 20)
                                         .clipShape(Capsule())
                                 }
                                 
                                 // Clean level
-                                HStack(spacing: 10) {
-                                    Image(systemName: "checkmark")
+                                HStack(spacing: 5) {
+                                    Image("clean")
+                                        .resizable()
+                                        .renderingMode(.template)
                                         .foregroundColor(Color(hex: "6F2232"))
+                                        .frame(width: 15, height: 20)
+                                    
+                                    Spacer()
                                     
                                     ProgressView(value: cleanLevel)
                                         .progressViewStyle(LinearProgressViewStyle(tint: Color(hex: "6F2232")))
                                         .background(Color(hex: "E6D2C3"))
-                                        .frame(width: 140, height: 12)
+                                        .frame(width: 140, height: 20)
                                         .clipShape(Capsule())
                                 }
                             }
+                            .padding(.top, 12)
                             
-                            Spacer()
                             
                             // Coffee machine image
-                            Image("Machine")
+                            Image("FrescopaSmartMachine")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 110, height: 110)
                                 .padding(0)
+                            
+                            Spacer()
+
                         }
                         .padding(.horizontal, 32.0)
                         
@@ -159,6 +177,21 @@ struct DashboardView: View {
                         .background(Color(hex: "F9EAD6"))
                         .cornerRadius(12)
                         .padding(.horizontal, 32)
+                        
+                        // Promo Banner
+                        AsyncImage(url: bannerURL) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(1, contentMode: .fit)
+                                .frame(maxWidth: .infinity, minHeight: 160, maxHeight: .infinity)
+                                .clipped()
+                        } placeholder: {
+                            ProgressView()
+                        }
+                        .aspectRatio(1, contentMode: .fit)
+                        .cornerRadius(12)
+                        .padding(.horizontal, 32)
+                            
                         
                         // Coffee options grid
                         LazyVGrid(columns: [
@@ -190,22 +223,20 @@ struct DashboardView: View {
                 }
                 
                 // Tab bar
-                HStack(spacing: 0) {
-                    tabItem(icon: "house.fill", isSelected: true)
-                    tabItem(icon: "cup.and.saucer.fill", isSelected: false)
-                    tabItem(icon: "leaf.fill", isSelected: false)
-                    tabItem(icon: "cart.fill", isSelected: false)
-                    tabItem(icon: "message.fill", isSelected: false)
+                HStack(spacing: 43) {
+                    Spacer()
+                    tabItem(icon: "home", isSelected: true)
+                    tabItem(icon: "machine", isSelected: false)
+                    tabItem(icon: "bean", isSelected: false)
+                    tabItem(icon: "cart", isSelected: false)
+                    tabItem(icon: "message", isSelected: false)
+                    Spacer()
                 }
                 .padding(.vertical, 28)
-                .padding(.horizontal, 20)
-                .background(Color(hex: "8E2426"))
+                .background(Color(hex: "A33532"))
+                .padding(.horizontal, 32)
             }
-            .disabled(showMenu)
-            .blur(radius: showMenu ? 3 : 0)
-        
         }
-        .animation(.easeInOut, value: showMenu)
         .edgesIgnoringSafeArea(.bottom)
     }
     
@@ -239,10 +270,12 @@ struct DashboardView: View {
         Button(action: {
             // Tab action
         }) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(isSelected ? .white : .white.opacity(0.7))
-                .frame(maxWidth: .infinity)
+            Image(icon)
+                .resizable()
+                .renderingMode(.template)
+                .frame(width: 32, height: 32)
+                .foregroundColor(Color(hex: "F4E9DC"))
+            
         }
         .background(Color.clear)
     }
@@ -252,10 +285,8 @@ struct DashboardView: View {
 struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            DashboardView(displayName: "Mark", username: "mszulc")
-            DashboardView(displayName: nil, username: "unknown")
+            DashboardView(displayName: "Mark", username: "mszulc", beanLevel: 0.5, waterLevel: 0.6, cleanLevel: 0.3, offerText: "Kick off your day with a perfect cup of coffee!")
+            DashboardView(displayName: "Sarah", username: "srose", beanLevel: 0.9, waterLevel: 0.2, cleanLevel: 0.1, offerText: "Begin each day with a perfect cup of coffee!")
         }
     }
 }
-
-
