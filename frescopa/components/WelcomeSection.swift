@@ -1,8 +1,17 @@
 import SwiftUI
 
+private var greeting: String {
+    let hour = Calendar.current.component(.hour, from: Date())
+    switch hour {
+    case 5..<12: return "Good morning"
+    case 12..<17: return "Good afternoon"
+    case 17..<22: return "Good evening"
+    default: return "Hello"
+    }
+}
+
 struct WelcomeSection: View {
     var displayName: String?
-    var greeting: String
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -27,7 +36,7 @@ struct WelcomeSection: View {
 
 struct WelcomeSection_Previews: PreviewProvider {
     static var previews: some View {
-        WelcomeSection(displayName: "Mark", greeting: "Good morning")
+        WelcomeSection(displayName: "Mark")
             .previewLayout(.sizeThatFits)
     }
 }
